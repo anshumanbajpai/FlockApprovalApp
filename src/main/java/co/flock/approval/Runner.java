@@ -32,6 +32,7 @@ public class Runner
     {
         _logger.debug("Starting..");
         _dbManager = new DbManager(getDbConfig());
+        _dbManager.insertBill(230, "u:007effelfl6l6ajf", "u:007effelfl6l6ajf");
         _messagingService = new MessagingService();
         port(9000);
         HashMap map = new HashMap();
@@ -96,8 +97,10 @@ public class Runner
         } else {
             billUpdated = _dbManager.rejectBill(id);
         }
-        if (billUpdated) {
-            //todo : send a msg
+        if (billUpdated && isApproval) {
+            MessagingService.sendBillApprovedMessageFromBot(_dbManager.getBill(id));
+        } else if (billUpdated && !isApproval) {
+            MessagingService.sendBillRejectedMessageFromBot(_dbManager.getBill(id));
         } else {
             res.status(401);
         }
