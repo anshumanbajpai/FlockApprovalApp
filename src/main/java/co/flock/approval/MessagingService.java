@@ -11,6 +11,8 @@ import co.flock.www.model.messages.Message;
 
 import org.apache.log4j.Logger;
 
+import com.google.gson.Gson;
+
 public class MessagingService
 {
     private static final Logger _logger = Logger.getLogger(MessagingService.class);
@@ -22,38 +24,25 @@ public class MessagingService
         Message message = new Message(bill.getApprover(), "Kindly approve");
         Attachment attachment = new Attachment();
         Button[] buttons = new Button[2];
-        buttons[0] = new Button()
-        {
-            {
-                setId("id1-approve");
-                setName("Approve");
-                Action action = new Action()
-                {
-                    {
-                        addDispatchEvent();
-                    }
-                };
-                setAction(action);
-            }
-        };
+        buttons[0] = new Button();
+        buttons[0].setId("id1-approve");
+        buttons[0].setName("Approve");
+        Action action = new Action();
+        action.addDispatchEvent();
+        buttons[0].setAction(action);
 
-        buttons[1] = new Button()
-        {
-            {
-                setId("id1-reject");
-                setName("Reject");
-                Action action = new Action()
-                {
-                    {
-                        addDispatchEvent();
-                    }
-                };
-                setAction(action);
-            }
-        };
+        buttons[1] = new Button();
+        buttons[1].setId("id1-reject");
+        buttons[1].setName("Reject");
+        action = new Action();
+        action.addDispatchEvent();
+        buttons[1].setAction(action);
+
         attachment.setId(String.valueOf(bill.getId()));
         attachment.setButtons(buttons);
         message.setAttachments(new Attachment[]{attachment});
+        String messageJson = new Gson().toJson(message);
+        _logger.debug("messageJson: " + messageJson);
         sendMessage(user.getUserToken(), message);
     }
 
