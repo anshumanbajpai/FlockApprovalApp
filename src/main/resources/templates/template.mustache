@@ -4,33 +4,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
-        <script>
-         $(document).ready(function() {
-             var amount;
-             $("#submit").click(function () {
-                 console.log("Submit clicked");
-                 amount = $("#amount").val();
-                 console.log("Amount entered: " + amount);
-                 generateApprovalRequest(amount);
-             });
-         });
-
-         function generateApprovalRequest(amount) {
-                 payload = {"amount": + amount};
-                 $.ajax({
-                     url: "http://localhost:9000/generateApprovalRequest",
-                     type: "post",
-                     data: JSON.stringify(payload),
-                     success: function (response) {
-                        console.log("successful response: " + JSON.stringify(response));
-                     },
-                     error: function(response, status, error) {
-                         console.log('XHR failure: ' + status);
-                         console.log(error);
-                     }
-                 });
-             }
-        </script>
+        <script src="js/sendAjaxRequest.js"></script>
+        <script src="js/createApproval.js"></script>
     <body>
         Enter the amount:
     </body>

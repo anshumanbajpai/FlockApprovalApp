@@ -22,6 +22,7 @@ public class Runner
         _logger.debug("Starting..");
         port(9000);
         HashMap map = new HashMap();
+        staticFileLocation("/public");
         map.put("resourcePrefix", "");
         get("/requestApproval", (req, res) -> new ModelAndView(map, "template.mustache"),
                 new MustacheTemplateEngine());
