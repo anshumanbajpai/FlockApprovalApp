@@ -18,7 +18,7 @@
          function generateApprovalRequest(amount) {
                  payload = {"amount": + amount};
                  $.ajax({
-                     url: "http://localhost:8080/generateApprovalRequest",
+                     url: "http://localhost:9000/generateApprovalRequest",
                      type: "post",
                      data: JSON.stringify(payload),
                      success: function (response) {
