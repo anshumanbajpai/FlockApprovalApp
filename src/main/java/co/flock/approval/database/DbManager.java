@@ -80,9 +80,6 @@ public class DbManager
         JdbcPooledConnectionSource connectionSource = new JdbcPooledConnectionSource(
             dbConfig.getConnectionURL());
         connectionSource.setMaxConnectionAgeMillis(Long.MAX_VALUE);
-        TableUtils.dropTable(connectionSource, Bill.class, true);
-        TableUtils.createTableIfNotExists(connectionSource, User.class);
-        TableUtils.createTable(connectionSource, Bill.class);
         _userDao = DaoManager.createDao(connectionSource, User.class);
         _billsDao = DaoManager.createDao(connectionSource, Bill.class);
 
