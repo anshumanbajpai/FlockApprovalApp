@@ -23,7 +23,6 @@ public class Runner
     private static DbManager _dbManager;
 
     public static void main(String[] args) throws Exception
-
     {
         _logger.debug("Starting..");
         _dbManager = new DbManager(getDbConfig());
@@ -31,10 +30,10 @@ public class Runner
         HashMap map = new HashMap();
         staticFileLocation("/public");
         map.put("resourcePrefix", "");
-        get("/requestApproval", (req, res) -> new ModelAndView(map, "template.mustache"),
+        get("/new", (req, res) -> new ModelAndView(map, "template.mustache"),
             new MustacheTemplateEngine());
 
-        post("/generateApprovalRequest", (req, res) -> {
+        post("/create", (req, res) -> {
             String body = req.body();
             System.out.println("Received request with body: " + body);
             ObjectMapper mapper = new ObjectMapper();
@@ -42,15 +41,17 @@ public class Runner
             System.out.println("approvalRequest created: " + approvalRequest);
             return "Approval created";
         });
+
         post("/", (req, res) -> {
-            _logger.debug("Req received : " + req);
+            _logger.debug("Req received : " + req.body());
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             JSONObject jsonObject = new JSONObject(req.body());
             String type = (String) jsonObject.get("name");
             if ("app.install".equals(type)) {
                 String userId = jsonObject.getString("userId");
-                _logger.debug("Install event received : " + userId);
+                _logger.debug("Install event received " + userId);
+                System.out.println("Userid : " + userId);
 
             } else {
                 _logger.debug("Got event: " + type);
