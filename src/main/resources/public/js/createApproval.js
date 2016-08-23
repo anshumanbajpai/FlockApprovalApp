@@ -6,6 +6,7 @@ $(document).ready(function()
          requestorId = "u:007effelfl6l6ajf";
          approverId = "u:3y373y1tty31368w";
          generateApprovalRequest(amount);
+         flock.close();
      });
 
      function generateApprovalRequest(amount) {
