@@ -1,0 +1,8 @@
+/production
+/out
+!.idea
+.idea/*
+!.idea/codeStyleSettings.xml
+!.idea/runConfigurations/
+target/*
+*.iml
