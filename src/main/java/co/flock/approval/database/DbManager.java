@@ -12,6 +12,7 @@ import java.util.List;
 public class DbManager
 {
     private Dao<User, String> _userDao;
+    private Dao<Bill, String> _billsDao;
 
     public DbManager(DbConfig dbConfig) throws SQLException
     {
@@ -38,12 +39,22 @@ public class DbManager
         _userDao.delete(user);
     }
 
+    public Bill insertBill(int billAmt, String creatorId, String approverId) throws SQLException
+    {
+        Bill bill = new Bill(billAmt, approverId, creatorId);
+        _billsDao.createOrUpdate(bill);
+        return bill;
+    }
+
     private void setupDatabase(DbConfig dbConfig) throws SQLException
     {
         JdbcPooledConnectionSource connectionSource = new JdbcPooledConnectionSource(
             dbConfig.getConnectionURL());
         connectionSource.setMaxConnectionAgeMillis(Long.MAX_VALUE);
         TableUtils.createTableIfNotExists(connectionSource, User.class);
+        TableUtils.createTableIfNotExists(connectionSource, Bill.class);
         _userDao = DaoManager.createDao(connectionSource, User.class);
+        _billsDao = DaoManager.createDao(connectionSource, Bill.class);
+
     }
 }
