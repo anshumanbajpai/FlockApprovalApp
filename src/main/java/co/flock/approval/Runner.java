@@ -17,7 +17,7 @@ public class Runner {
 
         post("/", (req, res) -> {
             System.out.println("Req : " + req.body());
-            return "hello post";
+            return "";
         });
     }
 }
