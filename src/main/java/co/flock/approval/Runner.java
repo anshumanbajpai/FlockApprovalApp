@@ -16,7 +16,7 @@ import static spark.Spark.*;
 
 public class Runner
 {
-    private static final Logger _logger = LoggerFactory.getLogger(Runner.class);
+    private static final Logger _logger = Logger.getLogger(Runner.class);
 
     public static void main(String[] args) throws IOException
     {
@@ -49,7 +49,8 @@ public class Runner
                 _logger.debug("Install event received " + userId);
                 System.out.println("Userid : " + userId);
 
-            } else {
+            } else
+            {
                 _logger.debug("Got event: " + type);
             }
             return "";
