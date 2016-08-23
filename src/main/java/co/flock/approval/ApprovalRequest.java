@@ -10,6 +10,16 @@ public class ApprovalRequest
     private String approverId;
     private String approverName;
 
+    public ApprovalRequest(int amount, String requestorId, String requestorName, String approverId,
+                           String approverName)
+    {
+        this.amount = amount;
+        this.requestorId = requestorId;
+        this.requestorName = requestorName;
+        this.approverId = approverId;
+        this.approverName = approverName;
+    }
+
     @JsonProperty("amount")
     public int getAmount()
     {

@@ -50,11 +50,7 @@ public class Runner
             _logger.debug("approvalRequest created: " + approvalRequest);
             User user = _dbManager.getUserById(approvalRequest.getRequestorId());
             _logger.debug("requestor user: " + user);
-            Bill bill = _dbManager
-                .insertBill(approvalRequest.getAmount(), approvalRequest.getRequestorId(), approvalRequest.getRequestorName(),
-                    approvalRequest.getApproverId(), approvalRequest.getApproverName());
-            _logger.debug("Sending approval request for bill: " + bill);
-            _messagingService.sendApprovalRequestMessage(user, bill);
+            insertBillAndSendMsg(approvalRequest, user);
             return "Approval created";
         });
 
@@ -100,9 +96,41 @@ public class Runner
                         approveOrRejectBill(approvalId, false);
                     }
                 }
+            } else if ("client.slashCommand".equalsIgnoreCase(type)) {
+                _logger.debug("Processing slash cmd press");
+                String text = jsonObject.getString("text");
+                String cmd = jsonObject.getString("command");
+
+                if (cmd.toLowerCase().equalsIgnoreCase("createbill") &&
+                    text.toLowerCase().contains("amount")) {
+                    String intValue = text.replaceAll("[^0-9]", "");
+                    if (intValue != null && intValue != "") {
+                        int amount = Integer.parseInt(intValue);
+                        String userId = jsonObject.getString("userId");
+                        String userName = jsonObject.getString("userName");
+                        String approverId = jsonObject.getString("chat");
+                        String approverName = jsonObject.getString("chatName");
+                        User user = _dbManager.getUserById(userId);
+                        insertBillAndSendMsg(
+                            new ApprovalRequest(amount, userId, userName, approverId, approverName),
+                            user);
+                    }
+                }
+
             }
             return "";
         });
+    }
+
+    private static void insertBillAndSendMsg(ApprovalRequest approvalRequest, User user)
+        throws SQLException
+    {
+        Bill bill = _dbManager
+            .insertBill(approvalRequest.getAmount(), approvalRequest.getRequestorId(),
+                approvalRequest.getRequestorName(), approvalRequest.getApproverId(),
+                approvalRequest.getApproverName());
+        _logger.debug("Sending approval request for bill: " + bill);
+        _messagingService.sendApprovalRequestMessage(user, bill);
     }
 
     private static String approveOrRejectBill(Request req, boolean isApproval) throws SQLException
