@@ -1,18 +1,13 @@
 package co.flock.approval;
 
+import co.flock.approval.database.Bill;
 import co.flock.approval.database.DbConfig;
 import co.flock.approval.database.DbManager;
 import co.flock.approval.database.User;
-import co.flock.www.FlockApiClient;
-import co.flock.www.model.messages.FlockMessage;
-import co.flock.www.model.messages.Message;
-
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-
 import spark.ModelAndView;
 import spark.template.mustache.MustacheTemplateEngine;
 
@@ -26,18 +21,19 @@ public class Runner
 {
     private static final Logger _logger = Logger.getLogger(Runner.class);
     private static DbManager _dbManager;
-    private static final String USER_TOKEN = "dd21bf92-38d5-40b1-a62d-d13f1a8d5d95";
+    private static MessagingService _messagingService;
 
     public static void main(String[] args) throws Exception
     {
         _logger.debug("Starting..");
         _dbManager = new DbManager(getDbConfig());
+        _messagingService = new MessagingService();
         port(9000);
         HashMap map = new HashMap();
         staticFileLocation("/public");
         map.put("resourcePrefix", "");
         get("/new", (req, res) -> new ModelAndView(map, "template.mustache"),
-            new MustacheTemplateEngine());
+                new MustacheTemplateEngine());
 
         post("/create", (req, res) -> {
             String body = req.body();
@@ -45,9 +41,11 @@ public class Runner
             ObjectMapper mapper = new ObjectMapper();
             ApprovalRequest approvalRequest = mapper.readValue(body, ApprovalRequest.class);
             _logger.debug("approvalRequest created: " + approvalRequest);
-            Message message = new Message(approvalRequest.getApproverId(),
-                "Please approve this bill for Rs. " + approvalRequest.getAmount());
-            sendMessage(message);
+            User user = _dbManager.getUserById(approvalRequest.getRequestorId());
+            _logger.debug("requestor user: " + user);
+            Bill bill = _dbManager.insertBill(approvalRequest.getAmount(), approvalRequest.getRequestorId(), approvalRequest.getApproverId());
+            _logger.debug("Sending approval request for bill: " + bill);
+            _messagingService.sendApprovalRequestMessage(user, bill);
             return "Approval created";
         });
 
@@ -58,12 +56,14 @@ public class Runner
             JSONObject jsonObject = new JSONObject(req.body());
             String type = (String) jsonObject.get("name");
             _logger.debug("Got event: " + type);
-            if ("app.install".equals(type)) {
+            if ("app.install".equals(type))
+            {
                 String userId = jsonObject.getString("userId");
                 String userToken = jsonObject.getString("userToken");
                 _dbManager.insertOrUpdateUser(new User(userId, userToken));
                 _logger.debug("User inserted : " + userId + "  " + userToken);
-            } else if ("app.uninstall".equalsIgnoreCase(type)) {
+            } else if ("app.uninstall".equalsIgnoreCase(type))
+            {
                 String userId = jsonObject.getString("userId");
                 _dbManager.deleteUser(new User(userId, ""));
                 _logger.debug("User deleted : " + userId);
@@ -76,18 +76,7 @@ public class Runner
     {
         ResourceBundle bundle = ResourceBundle.getBundle("config", Locale.getDefault());
         return new DbConfig(bundle.getString("db_host"),
-            Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
-            bundle.getString("db_username"), bundle.getString("db_password"));
-    }
-
-    private static void sendMessage(Message message)
-    {
-        FlockMessage flockMessage = new FlockMessage(message);
-        FlockApiClient flockApiClient = new FlockApiClient(USER_TOKEN, false);
-        try {
-            flockApiClient.chatSendMessage(flockMessage);
-        } catch (Exception e) {
-            _logger.error("Failed to send message: ", e);
-        }
+                Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
+                bundle.getString("db_username"), bundle.getString("db_password"));
     }
 }
