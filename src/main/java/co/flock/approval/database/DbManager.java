@@ -43,9 +43,9 @@ public class DbManager
         _userDao.delete(user);
     }
 
-    public Bill insertBill(int billAmt, String creatorId, String approverId) throws SQLException
+    public Bill insertBill(int billAmt, String creatorId, String creatorName, String approverId, String approverName) throws SQLException
     {
-        Bill bill = new Bill(billAmt, approverId, creatorId);
+        Bill bill = new Bill(billAmt, approverId, approverName, creatorId, creatorName);
         _billsDao.createOrUpdate(bill);
         return bill;
     }

@@ -17,26 +17,32 @@ public class Bill
     private int _amount;
     @DatabaseField(columnName = Fields.APPROVER, canBeNull = false)
     private String _approver;
+    @DatabaseField(columnName = Fields.APPROVER_NAME, canBeNull = true)
+    private String _approverName;
     @DatabaseField(columnName = Fields.CREATOR, canBeNull = false)
     private String _creator;
+    @DatabaseField(columnName = Fields.CREATOR_NAME, canBeNull = true)
+    private String _creatorName;
     @DatabaseField(columnName = Fields.STATUS, dataType = DataType.ENUM_INTEGER, canBeNull = false, defaultValue = "0")
     private Status _status;
     @DatabaseField(columnName = Fields.CREATION_DATE, dataType = DataType.DATE)
     private Date _creationDate;
 
 
-    public Bill(int amount, String approver, String creator, Status status, Date date)
+    public Bill(int amount, String approver, String approverName, String creator, String creatorName, Status status, Date date)
     {
         _amount = amount;
         _approver = approver;
+        _approverName = approverName;
         _creator = creator;
+        _creatorName = creatorName;
         _status = status;
         _creationDate = date;
     }
 
-    public Bill(int amount, String approver, String creator)
+    public Bill(int amount, String approver, String approverName, String creator, String creatorName)
     {
-        this(amount, approver, creator, Status.PENDING, new Date());
+        this(amount, approver, approverName, creator, creatorName, Status.PENDING, new Date());
     }
 
     public Bill()
@@ -56,6 +62,16 @@ public class Bill
     public String getApprover()
     {
         return _approver;
+    }
+
+    public String getApproverName()
+    {
+        return _approverName;
+    }
+
+    public String getCreatorName()
+    {
+        return _creatorName;
     }
 
     public String getCreator()
@@ -82,12 +98,15 @@ public class Bill
     public String toString()
     {
         return "Bill{" +
-               "_id=" + _id +
-               ", _amount=" + _amount +
-               ", _approver='" + _approver + '\'' +
-               ", _creator='" + _creator + '\'' +
-               ", _status=" + _status +
-               '}';
+                "_id=" + _id +
+                ", _amount=" + _amount +
+                ", _approver='" + _approver + '\'' +
+                ", _approverName='" + _approverName + '\'' +
+                ", _creator='" + _creator + '\'' +
+                ", _creatorName='" + _creatorName + '\'' +
+                ", _status=" + _status +
+                ", _creationDate=" + _creationDate +
+                '}';
     }
 
     public enum Status

@@ -12,7 +12,9 @@ $(document).ready(function()
          console.log("userId: " + parsedEvent.userId);
          console.log("chat: " + parsedEvent.chat);
          requestorId = parsedEvent.userId;
+         requestorId = parsedEvent.userName;
          approverId = parsedEvent.chat;
+         approverName = parsedEvent.chatName;
          generateApprovalRequest(amount);
          flock.close();
      });
@@ -22,7 +24,9 @@ $(document).ready(function()
           {
               "amount": amount,
               "requestorId": requestorId,
-              "approverId": approverId
+              "requestorName": requestorName,
+              "approverId": approverId,
+              "approverName": approverName
           };
           sendAjaxRequest(baseUrl + "create", "post", payload, function (response) {
               console.log("successful response: " + JSON.stringify(response));
