@@ -2,13 +2,17 @@ package co.flock.approval;
 
 import co.flock.approval.database.DbConfig;
 import co.flock.approval.database.DbManager;
+import co.flock.approval.database.User;
 import co.flock.www.FlockApiClient;
 import co.flock.www.model.messages.FlockMessage;
 import co.flock.www.model.messages.Message;
+
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+
 import spark.ModelAndView;
 import spark.template.mustache.MustacheTemplateEngine;
 
@@ -33,15 +37,16 @@ public class Runner
         staticFileLocation("/public");
         map.put("resourcePrefix", "");
         get("/new", (req, res) -> new ModelAndView(map, "template.mustache"),
-                new MustacheTemplateEngine());
+            new MustacheTemplateEngine());
 
         post("/create", (req, res) -> {
             String body = req.body();
-            System.out.println("Received request with body: " + body);
+            _logger.debug("Received request with body: " + body);
             ObjectMapper mapper = new ObjectMapper();
             ApprovalRequest approvalRequest = mapper.readValue(body, ApprovalRequest.class);
-            System.out.println("approvalRequest created: " + approvalRequest);
-            Message message = new Message(approvalRequest.getApproverId(), "Please approve this bill for Rs. " + approvalRequest.getAmount());
+            _logger.debug("approvalRequest created: " + approvalRequest);
+            Message message = new Message(approvalRequest.getApproverId(),
+                "Please approve this bill for Rs. " + approvalRequest.getAmount());
             sendMessage(message);
             return "Approval created";
         });
@@ -52,16 +57,16 @@ public class Runner
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             JSONObject jsonObject = new JSONObject(req.body());
             String type = (String) jsonObject.get("name");
-            if ("app.install".equals(type))
-            {
+            _logger.debug("Got event: " + type);
+            if ("app.install".equals(type)) {
                 String userId = jsonObject.getString("userId");
                 String userToken = jsonObject.getString("userToken");
-                _logger.debug("Install event received " + userId);
-                System.out.println("Userid : " + userId);
-                System.out.println("userToken: " + userToken);
-            } else
-            {
-                _logger.debug("Got event: " + type);
+                _dbManager.insertOrUpdateUser(new User(userId, userToken));
+                _logger.debug("User inserted : " + userId + "  " + userToken);
+            } else if ("app.uninstall".equalsIgnoreCase(type)) {
+                String userId = jsonObject.getString("userId");
+                _dbManager.deleteUser(new User(userId, ""));
+                _logger.debug("User deleted : " + userId);
             }
             return "";
         });
@@ -71,19 +76,17 @@ public class Runner
     {
         ResourceBundle bundle = ResourceBundle.getBundle("config", Locale.getDefault());
         return new DbConfig(bundle.getString("db_host"),
-                Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
-                bundle.getString("db_username"), bundle.getString("db_password"));
+            Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
+            bundle.getString("db_username"), bundle.getString("db_password"));
     }
 
     private static void sendMessage(Message message)
     {
         FlockMessage flockMessage = new FlockMessage(message);
         FlockApiClient flockApiClient = new FlockApiClient(USER_TOKEN, false);
-        try
-        {
+        try {
             flockApiClient.chatSendMessage(flockMessage);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             _logger.error("Failed to send message: ", e);
         }
     }
