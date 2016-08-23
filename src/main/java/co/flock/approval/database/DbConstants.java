@@ -16,5 +16,6 @@ public class DbConstants
         public static final String AMOUNT = "amount";
         public static final String CREATOR = "creator";
         public static final String APPROVER = "approver";
+        public static final String STATUS = "status";
     }
 }

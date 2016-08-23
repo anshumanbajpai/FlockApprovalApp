@@ -9,6 +9,8 @@ import com.j256.ormlite.table.TableUtils;
 import java.sql.SQLException;
 import java.util.List;
 
+import co.flock.approval.database.Bill.Status;
+
 public class DbManager
 {
     private Dao<User, String> _userDao;
@@ -44,6 +46,25 @@ public class DbManager
         Bill bill = new Bill(billAmt, approverId, creatorId);
         _billsDao.createOrUpdate(bill);
         return bill;
+    }
+
+    public Bill getBill(int billId) throws SQLException
+    {
+        return _billsDao.queryForId(String.valueOf(billId));
+    }
+
+    public void approveBill(int billId) throws SQLException
+    {
+        Bill bill = _billsDao.queryForId(String.valueOf(billId));
+        bill.setStatus(Status.APPROVED);
+        _billsDao.update(bill);
+    }
+
+    public void rejectBill(int billId) throws SQLException
+    {
+        Bill bill = _billsDao.queryForId(String.valueOf(billId));
+        bill.setStatus(Status.REJECTED);
+        _billsDao.update(bill);
     }
 
     private void setupDatabase(DbConfig dbConfig) throws SQLException
