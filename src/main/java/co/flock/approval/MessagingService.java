@@ -25,14 +25,14 @@ public class MessagingService
         Attachment attachment = new Attachment();
         Button[] buttons = new Button[2];
         buttons[0] = new Button();
-        buttons[0].setId("id1-approve");
+        buttons[0].setId("a" + attachment.getId());
         buttons[0].setName("Approve");
         Action action = new Action();
         action.addDispatchEvent();
         buttons[0].setAction(action);
 
         buttons[1] = new Button();
-        buttons[1].setId("id1-reject");
+        buttons[1].setId("r" + attachment.getId());
         buttons[1].setName("Reject");
         action = new Action();
         action.addDispatchEvent();
