@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="http://cdn.staticfile.org/pure/0.6.0/pure-min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+        <script src="https://apps-static.flock.co/js-sdk/0.1.0/flock.js"></script>
+    <body>
+    <div id ="pending">
+    <h1>All Bills</h1>
+       <table style="width:50%" class="pure-table pure-table-bordered">
+               <thead>
+                   <th>Amount</th>
+                   <th>Status</th>
+                    <th>Date</th>
+               </thead>
+               <tbody>
+               <!--{{#bills}}-->
+                   <tr>
+                       <td>{{amount}}</td>
+                       <td>{{creationDate}}</td>
+                       <td>{{status}}</td>
+                   </tr>
+               <!--{{/bills}}-->
+               </tbody>
+           </table>
+    </div>
+
+    </body>
+</html>

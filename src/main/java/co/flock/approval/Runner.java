@@ -16,7 +16,9 @@ import spark.template.mustache.MustacheTemplateEngine;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import static spark.Spark.*;
@@ -58,6 +60,11 @@ public class Runner
             return "Approval created";
         });
 
+        get("/viewall",
+            (req, res) -> new ModelAndView(getLauncherMap(req.queryParams("flockEvent")),
+                "template_launcher.mustache"), new MustacheTemplateEngine());
+
+
         post("/approve", (req, res) -> {
             _logger.debug("Received approval request with body: " + req.body());
             return approveOrRejectBill(req, true);
@@ -85,11 +92,11 @@ public class Runner
             } else if ("client.pressButton".equalsIgnoreCase(type)) {
                 String buttonName = jsonObject.getString("button");
                 _logger.debug("buttonName: " + buttonName);
-                if("attachmentButton".equalsIgnoreCase(buttonName)) {
+                if ("attachmentButton".equalsIgnoreCase(buttonName)) {
                     _logger.debug("Processing attachment button press");
                     String buttonId = jsonObject.getString("buttonId");
                     String approvalId = buttonId.substring(1);
-                    if(buttonId.startsWith("a")) {
+                    if (buttonId.startsWith("a")) {
                         approveOrRejectBill(approvalId, true);
                     } else {
                         approveOrRejectBill(approvalId, false);
@@ -100,8 +107,7 @@ public class Runner
         });
     }
 
-    private static String approveOrRejectBill(Request req, boolean isApproval)
-        throws SQLException
+    private static String approveOrRejectBill(Request req, boolean isApproval) throws SQLException
     {
         JSONObject jsonObject = new JSONObject(req.body());
         String id = jsonObject.getString("id");
@@ -132,5 +138,19 @@ public class Runner
         return new DbConfig(bundle.getString("db_host"),
             Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
             bundle.getString("db_username"), bundle.getString("db_password"));
+    }
+
+    private static Map<String, List<Bill>> getLauncherMap(String queryString) throws SQLException
+    {
+        Map<String, List<Bill>> s = new HashMap<>();
+        _logger.debug("String : " + queryString);
+        JSONObject jsonObject = new JSONObject(queryString);
+        String userId = jsonObject.getString("userId");
+        _logger.debug("Userid : " + userId);
+
+        List<Bill> bills = _dbManager.getBillsForUser(userId);
+        _logger.debug("Bills fetched : " + bills);
+        s.put("bills", bills);
+        return s;
     }
 }

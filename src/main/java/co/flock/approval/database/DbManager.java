@@ -4,12 +4,14 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.dao.Dao.CreateOrUpdateStatus;
 import com.j256.ormlite.dao.DaoManager;
 import com.j256.ormlite.jdbc.JdbcPooledConnectionSource;
-import com.j256.ormlite.table.TableUtils;
+import com.j256.ormlite.stmt.PreparedQuery;
+import com.j256.ormlite.stmt.QueryBuilder;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import co.flock.approval.database.Bill.Status;
+import co.flock.approval.database.DbConstants.Fields;
 
 public class DbManager
 {
@@ -51,6 +53,14 @@ public class DbManager
     public Bill getBill(String billId) throws SQLException
     {
         return _billsDao.queryForId(billId);
+    }
+
+    public List<Bill> getBillsForUser(String id) throws SQLException
+    {
+        QueryBuilder<Bill, String> queryBuilder = _billsDao.queryBuilder();
+        queryBuilder.where().eq(Fields.CREATOR, id);
+        PreparedQuery<Bill> preparedQuery = queryBuilder.prepare();
+        return _billsDao.query(preparedQuery);
     }
 
     public boolean approveBill(String billId) throws SQLException
