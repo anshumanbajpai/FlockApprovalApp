@@ -5,15 +5,17 @@ import co.flock.approval.database.DbConfig;
 import co.flock.approval.database.DbManager;
 import co.flock.approval.database.User;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import spark.ModelAndView;
+import spark.Request;
+import spark.Response;
 import spark.template.mustache.MustacheTemplateEngine;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -54,10 +56,18 @@ public class Runner
             return "Approval created";
         });
 
+        post("/approve", (req, res) -> {
+            _logger.debug("Received approval request with body: " + req.body());
+            return approveOrRejectBill(req, res, true);
+        });
+
+        post("/reject", (req, res) -> {
+            _logger.debug("Received rejection request with body: " + req.body());
+            return approveOrRejectBill(req, res, false);
+        });
+
         post("/", (req, res) -> {
             _logger.debug("Req received : " + req.body());
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             JSONObject jsonObject = new JSONObject(req.body());
             String type = (String) jsonObject.get("name");
             _logger.debug("Got event: " + type);
@@ -73,6 +83,26 @@ public class Runner
             }
             return "";
         });
+    }
+
+    private static String approveOrRejectBill(Request req, Response res, boolean isApproval)
+        throws SQLException
+    {
+        JSONObject jsonObject = new JSONObject(req.body());
+        String id = jsonObject.getString("id");
+        boolean billUpdated;
+        if (isApproval) {
+            billUpdated = _dbManager.approveBill(id);
+        } else {
+            billUpdated = _dbManager.rejectBill(id);
+        }
+        if (billUpdated) {
+            //todo : send a msg
+        } else {
+            res.status(401);
+        }
+
+        return "";
     }
 
     private static DbConfig getDbConfig()

@@ -48,24 +48,24 @@ public class DbManager
         return bill;
     }
 
-    public Bill getBill(int billId) throws SQLException
+    public Bill getBill(String billId) throws SQLException
     {
-        return _billsDao.queryForId(String.valueOf(billId));
+        return _billsDao.queryForId(billId);
     }
 
-    public boolean approveBill(int billId) throws SQLException
+    public boolean approveBill(String billId) throws SQLException
     {
         return updateBillStatus(billId, Status.APPROVED);
     }
 
-    public boolean rejectBill(int billId) throws SQLException
+    public boolean rejectBill(String billId) throws SQLException
     {
         return updateBillStatus(billId, Status.REJECTED);
     }
 
-    private boolean updateBillStatus(int billId, Status status) throws SQLException
+    private boolean updateBillStatus(String billId, Status status) throws SQLException
     {
-        Bill bill = _billsDao.queryForId(String.valueOf(billId));
+        Bill bill = _billsDao.queryForId(billId);
         if (bill != null) {
             bill.setStatus(status);
             _billsDao.update(bill);
