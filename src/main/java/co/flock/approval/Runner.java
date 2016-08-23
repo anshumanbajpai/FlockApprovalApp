@@ -30,7 +30,7 @@ public class Runner
 
     public static void main(String[] args) throws Exception
     {
-        secure("deploy/keystore.jks", "password", null, null);
+        //secure("deploy/keystore.jks", "password", null, null);
         _logger.debug("Starting..");
         _dbManager = new DbManager(getDbConfig());
         //add dummy bill with valid guids
