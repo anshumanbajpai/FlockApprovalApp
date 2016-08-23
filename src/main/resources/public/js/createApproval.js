@@ -3,8 +3,8 @@ $(document).ready(function()
      var amount;
      $("#submit").click(function () {
          amount = $("#amount").val();
-         requestorId = "u:123";
-         approverId = "u:456";
+         requestorId = "u:007effelfl6l6ajf";
+         approverId = "u:3y373y1tty31368w";
          generateApprovalRequest(amount);
      });
 

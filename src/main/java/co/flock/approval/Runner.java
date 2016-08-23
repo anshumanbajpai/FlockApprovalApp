@@ -1,13 +1,14 @@
 package co.flock.approval;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.apache.log4j.Logger;
-import org.json.JSONObject;
-
 import co.flock.approval.database.DbConfig;
 import co.flock.approval.database.DbManager;
+import co.flock.www.FlockApiClient;
+import co.flock.www.model.messages.FlockMessage;
+import co.flock.www.model.messages.Message;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
 import spark.ModelAndView;
 import spark.template.mustache.MustacheTemplateEngine;
 
@@ -21,6 +22,7 @@ public class Runner
 {
     private static final Logger _logger = Logger.getLogger(Runner.class);
     private static DbManager _dbManager;
+    private static final String USER_TOKEN = "dd21bf92-38d5-40b1-a62d-d13f1a8d5d95";
 
     public static void main(String[] args) throws Exception
     {
@@ -31,7 +33,7 @@ public class Runner
         staticFileLocation("/public");
         map.put("resourcePrefix", "");
         get("/new", (req, res) -> new ModelAndView(map, "template.mustache"),
-            new MustacheTemplateEngine());
+                new MustacheTemplateEngine());
 
         post("/create", (req, res) -> {
             String body = req.body();
@@ -39,6 +41,8 @@ public class Runner
             ObjectMapper mapper = new ObjectMapper();
             ApprovalRequest approvalRequest = mapper.readValue(body, ApprovalRequest.class);
             System.out.println("approvalRequest created: " + approvalRequest);
+            Message message = new Message(approvalRequest.getApproverId(), "Please approve this bill for Rs. " + approvalRequest.getAmount());
+            sendMessage(message);
             return "Approval created";
         });
 
@@ -48,12 +52,15 @@ public class Runner
             mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             JSONObject jsonObject = new JSONObject(req.body());
             String type = (String) jsonObject.get("name");
-            if ("app.install".equals(type)) {
+            if ("app.install".equals(type))
+            {
                 String userId = jsonObject.getString("userId");
+                String userToken = jsonObject.getString("userToken");
                 _logger.debug("Install event received " + userId);
                 System.out.println("Userid : " + userId);
-
-            } else {
+                System.out.println("userToken: " + userToken);
+            } else
+            {
                 _logger.debug("Got event: " + type);
             }
             return "";
@@ -64,7 +71,20 @@ public class Runner
     {
         ResourceBundle bundle = ResourceBundle.getBundle("config", Locale.getDefault());
         return new DbConfig(bundle.getString("db_host"),
-            Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
-            bundle.getString("db_username"), bundle.getString("db_password"));
+                Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
+                bundle.getString("db_username"), bundle.getString("db_password"));
+    }
+
+    private static void sendMessage(Message message)
+    {
+        FlockMessage flockMessage = new FlockMessage(message);
+        FlockApiClient flockApiClient = new FlockApiClient(USER_TOKEN, false);
+        try
+        {
+            flockApiClient.chatSendMessage(flockMessage);
+        } catch (Exception e)
+        {
+            _logger.error("Failed to send message: ", e);
+        }
     }
 }
