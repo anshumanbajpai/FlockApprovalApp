@@ -8,9 +8,8 @@ $(document).ready(function()
 
      function generateApprovalRequest(amount) {
           payload = {"amount": + amount};
-          sendAjaxRequest("http://localhost:9000/generateApprovalRequest", "post", payload, function (response) {
+          sendAjaxRequest(baseUrl + "create", "post", payload, function (response) {
               console.log("successful response: " + JSON.stringify(response));
-
           });
      }
 });
