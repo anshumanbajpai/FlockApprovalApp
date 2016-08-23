@@ -66,7 +66,7 @@ public class DbManager
     private boolean updateBillStatus(String billId, Status status) throws SQLException
     {
         Bill bill = _billsDao.queryForId(billId);
-        if (bill != null) {
+        if (bill != null && bill.getStatus().equals(Status.PENDING)) {
             bill.setStatus(status);
             _billsDao.update(bill);
             return true;

@@ -32,6 +32,8 @@ public class Runner
     {
         _logger.debug("Starting..");
         _dbManager = new DbManager(getDbConfig());
+        //add dummy bill with valid guids
+        _dbManager.insertBill(230, "u:hjo55jy33x5onyjx", "u:007effelfl6l6ajf");
         _messagingService = new MessagingService();
         port(9000);
         HashMap map = new HashMap();
@@ -96,9 +98,12 @@ public class Runner
         } else {
             billUpdated = _dbManager.rejectBill(id);
         }
-        if (billUpdated) {
-            //todo : send a msg
+        if (billUpdated && isApproval) {
+            MessagingService.sendBillApprovedOrRejectedMsgFromBot(_dbManager.getBill(id), true);
+        } else if (billUpdated && !isApproval) {
+            MessagingService.sendBillApprovedOrRejectedMsgFromBot(_dbManager.getBill(id), false);
         } else {
+            _logger.debug("Bill not present or already approved or rejected ");
             res.status(401);
         }
 
