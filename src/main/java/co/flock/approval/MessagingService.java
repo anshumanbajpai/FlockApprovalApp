@@ -33,7 +33,10 @@ public class MessagingService
                 };
                 setAction(action);
             }
+        };
 
+        buttons[1]  = new Button()
+        {
             {
                 setId("id1-reject");
                 setName("Reject");
