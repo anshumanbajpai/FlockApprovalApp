@@ -99,9 +99,9 @@ public class Runner
             billUpdated = _dbManager.rejectBill(id);
         }
         if (billUpdated && isApproval) {
-            MessagingService.sendBillApprovedMessageFromBot(_dbManager.getBill(id));
+            MessagingService.sendBillApprovedOrRejectedMsgFromBot(_dbManager.getBill(id), true);
         } else if (billUpdated && !isApproval) {
-            MessagingService.sendBillRejectedMessageFromBot(_dbManager.getBill(id));
+            MessagingService.sendBillApprovedOrRejectedMsgFromBot(_dbManager.getBill(id), false);
         } else {
             _logger.debug("Bill not present or already approved or rejected ");
             res.status(401);

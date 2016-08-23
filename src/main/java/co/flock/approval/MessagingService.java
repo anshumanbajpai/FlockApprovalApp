@@ -46,24 +46,18 @@ public class MessagingService
         sendMessage(user.getUserToken(), message);
     }
 
-    public static void sendBillApprovedMessageFromBot(Bill bill)
+    public static void sendBillApprovedOrRejectedMsgFromBot(Bill bill, boolean approval)
     {
-        Message message = new Message(bill.getCreator(),
-            "Your bill of amount Rs " + bill.getAmount() + " has been approved.");
-        sendMessage(BOT_TOKEN, message);
-    }
-
-    public static void sendBillRejectedMessageFromBot(Bill bill)
-    {
-        Message message = new Message(bill.getCreator(),
-            "Your bill of amount Rs " + bill.getAmount() + " has been rejected.");
-
+        String text = String
+            .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
+                bill.getCreationDate(), approval ? "accepted" : "rejected");
+        Message message = new Message(bill.getCreator(), text);
         sendMessage(BOT_TOKEN, message);
     }
 
     private static void sendMessage(String token, Message message)
     {
-        _logger.debug("Sending message : " + message.getTo());
+        _logger.debug("Sending message to  : " + message.getTo() + " text : " + message.getText());
         FlockMessage flockMessage = new FlockMessage(message);
         FlockApiClient flockApiClient = new FlockApiClient(token, false);
         try {
