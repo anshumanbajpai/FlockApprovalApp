@@ -25,20 +25,20 @@ public class MessagingService
         Attachment attachment = new Attachment();
         Button[] buttons = new Button[2];
         buttons[0] = new Button();
-        buttons[0].setId("a" + attachment.getId());
+        attachment.setId(String.valueOf(bill.getId()));
+        buttons[0].setId("a" + bill.getId());
         buttons[0].setName("Approve");
         Action action = new Action();
         action.addDispatchEvent();
         buttons[0].setAction(action);
 
         buttons[1] = new Button();
-        buttons[1].setId("r" + attachment.getId());
+        buttons[1].setId("r" + bill.getId());
         buttons[1].setName("Reject");
         action = new Action();
         action.addDispatchEvent();
         buttons[1].setAction(action);
 
-        attachment.setId(String.valueOf(bill.getId()));
         attachment.setButtons(buttons);
         message.setAttachments(new Attachment[]{attachment});
         String messageJson = new Gson().toJson(message);

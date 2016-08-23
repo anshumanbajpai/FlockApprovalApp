@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import spark.ModelAndView;
 import spark.Request;
-import spark.Response;
 import spark.template.mustache.MustacheTemplateEngine;
 
 import java.sql.SQLException;
@@ -61,12 +60,12 @@ public class Runner
 
         post("/approve", (req, res) -> {
             _logger.debug("Received approval request with body: " + req.body());
-            return approveOrRejectBill(req, res, true);
+            return approveOrRejectBill(req, true);
         });
 
         post("/reject", (req, res) -> {
             _logger.debug("Received rejection request with body: " + req.body());
-            return approveOrRejectBill(req, res, false);
+            return approveOrRejectBill(req, false);
         });
 
         post("/", (req, res) -> {
@@ -83,16 +82,35 @@ public class Runner
                 String userId = jsonObject.getString("userId");
                 _dbManager.deleteUser(new User(userId, ""));
                 _logger.debug("User deleted : " + userId);
+            } else if ("client.pressButton".equalsIgnoreCase(type)) {
+                String buttonName = jsonObject.getString("button");
+                _logger.debug("buttonName: " + buttonName);
+                if("attachmentButton".equalsIgnoreCase(buttonName)) {
+                    _logger.debug("Processing attachment button press");
+                    String buttonId = jsonObject.getString("buttonId");
+                    String approvalId = buttonId.substring(1);
+                    if(buttonId.startsWith("a")) {
+                        approveOrRejectBill(approvalId, true);
+                    } else {
+                        approveOrRejectBill(approvalId, false);
+                    }
+                }
             }
             return "";
         });
     }
 
-    private static String approveOrRejectBill(Request req, Response res, boolean isApproval)
+    private static String approveOrRejectBill(Request req, boolean isApproval)
         throws SQLException
     {
         JSONObject jsonObject = new JSONObject(req.body());
         String id = jsonObject.getString("id");
+        approveOrRejectBill(id, isApproval);
+        return "";
+    }
+
+    private static void approveOrRejectBill(String id, boolean isApproval) throws SQLException
+    {
         boolean billUpdated;
         if (isApproval) {
             billUpdated = _dbManager.approveBill(id);
@@ -101,14 +119,11 @@ public class Runner
         }
         if (billUpdated && isApproval) {
             MessagingService.sendBillApprovedOrRejectedMsgFromBot(_dbManager.getBill(id), true);
-        } else if (billUpdated && !isApproval) {
+        } else if (billUpdated) {
             MessagingService.sendBillApprovedOrRejectedMsgFromBot(_dbManager.getBill(id), false);
         } else {
             _logger.debug("Bill not present or already approved or rejected ");
-            res.status(401);
         }
-
-        return "";
     }
 
     private static DbConfig getDbConfig()
