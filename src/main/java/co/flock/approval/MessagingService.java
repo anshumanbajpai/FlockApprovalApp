@@ -74,7 +74,7 @@ public class MessagingService
 
     private static void sendMessage(String token, Message message)
     {
-        _logger.debug("Sending message");
+        _logger.debug("Sending message : " + message.getTo());
         FlockMessage flockMessage = new FlockMessage(message);
         FlockApiClient flockApiClient = new FlockApiClient(token, false);
         try {
