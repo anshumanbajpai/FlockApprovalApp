@@ -47,7 +47,7 @@ public class ApprovalRequest
     @JsonProperty("approverName")
     public String getApproverName()
     {
-        return approverId;
+        return approverName;
     }
 
     @Override
