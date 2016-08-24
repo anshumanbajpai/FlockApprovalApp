@@ -154,7 +154,7 @@ public class Runner
                 approvalRequest.getApproverName());
         _logger.debug("Sending approval request for bill: " + bill);
         _imgCreator.createBillImg(bill);
-        String p = getBaseUrl() + "/js/bill" + bill.getId() + ".png";
+        String p = getBaseUrl() + "js/bill" + bill.getId() + ".png";
         _logger.debug("Path : " + p);
         bill.setPath(p);
         _messagingService.sendApprovalRequestMessage(user, bill);
