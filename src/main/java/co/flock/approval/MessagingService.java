@@ -46,7 +46,7 @@ public class MessagingService
         views.setImage(imageView);
 
         WidgetView widgetView = new WidgetView();
-        widgetView.setSrc("https://5ab5e251.ngrok.io/view?billId=" + bill.getId());
+        widgetView.setSrc("https://lgc-flockapproval.fwd.wf/view?billId=" + bill.getId());
         views.setWidget(widgetView);
         attachment.setViews(views);
         attachment.setButtons(buttons);
@@ -61,8 +61,8 @@ public class MessagingService
     public static void sendBillApprovedOrRejectedMsgFromBot(Bill bill, boolean approval)
     {
         String text = String
-            .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
-                bill.getCreationDate(), approval ? "accepted" : "rejected");
+                .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
+                        bill.getCreationDate(), approval ? "accepted" : "rejected");
         Message message = new Message(bill.getCreator(), text);
         sendMessage(BOT_TOKEN, message);
     }
