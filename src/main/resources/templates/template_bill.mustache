@@ -6,17 +6,17 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.2.1/mustache.min.js"></script>
         <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
         <script src="https://apps-static.flock.co/js-sdk/0.1.0/flock.js"></script>
-        <script src="js/constants.js"></script>
-        <script src="js/sendAjaxRequest.js"></script>
-        <script src="js/createApproval.js"></script>
     <body>
-        Enter the amount:
+    <div id ="details" >
+    <h1>Bill details</h1>
+    <ul>
+           <li>Bill id : {{bill.id}}</li>
+           <li> Status : {{bill.status}}  </li>
+           <li> Amount :  {{bill.amount}}  </li>
+           <li> Approver : {{bill.approverName}}  </li>
+           <li> Creation Date :  {{bill.creationDate}}  </li>
+           </ul>
+    </div>
+
     </body>
-    <br/>
-    <br/>
-    <input type="number" id="amount" min="0">
-    <br/>
-    <br/>
-    <br/>
-    <button id="submit" type="button" class="pure-button pure-button-primary">Submit</button>
 </html>

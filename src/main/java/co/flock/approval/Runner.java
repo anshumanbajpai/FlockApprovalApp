@@ -59,6 +59,11 @@ public class Runner
                 "template_launcher.mustache"), new MustacheTemplateEngine());
 
 
+        get("/view",
+            (req, res) -> new ModelAndView(getLauncherMapForBill(req.queryParams("billId")),
+                "template_bill.mustache"), new MustacheTemplateEngine());
+
+
         post("/approve", (req, res) -> {
             _logger.debug("Received approval request with body: " + req.body());
             return approveOrRejectBill(req, true);
@@ -120,6 +125,17 @@ public class Runner
             }
             return "";
         });
+    }
+
+    private static Map<String,Bill> getLauncherMapForBill(String billId) throws SQLException
+    {
+        Map<String, Bill> s = new HashMap<>();
+        _logger.debug("String : " + billId);
+
+        Bill bill = _dbManager.getBill(billId);
+        _logger.debug("Bills fetched : " + bill);
+        s.put("bill", bill);
+        return s;
     }
 
     private static void insertBillAndSendMsg(ApprovalRequest approvalRequest, User user)
