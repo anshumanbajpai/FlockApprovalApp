@@ -6,10 +6,8 @@ import co.flock.www.FlockApiClient;
 import co.flock.www.model.messages.Attachments.*;
 import co.flock.www.model.messages.FlockMessage;
 import co.flock.www.model.messages.Message;
-
-import org.apache.log4j.Logger;
-
 import com.google.gson.Gson;
+import org.apache.log4j.Logger;
 
 public class MessagingService
 {
@@ -41,6 +39,11 @@ public class MessagingService
         htmlView.setInline("<style type=\"text/css\">body { margin:0; padding:0; } ul { margin:0; padding: 5px 0 0 20px; } li { line-height:19px; } </style><div style=\"font-family:'Lucida Grande',Arial,sans-serif;font-size:14px;font-weight:400\"><ul><li>Amount Requested: Rs. " + bill.getAmount() + "</li><li>Status: " + bill.getStatus().toString() + "</li></ul></div>");
         View views = new View();
         views.setHtml(htmlView);
+
+
+        WidgetView widgetView = new WidgetView();
+        widgetView.setSrc("https://5ab5e251.ngrok.io/view?billId=" + bill.getId());
+        views.setWidget(widgetView);
         attachment.setViews(views);
         attachment.setButtons(buttons);
         message.setAttachments(new Attachment[]{attachment});
@@ -52,8 +55,8 @@ public class MessagingService
     public static void sendBillApprovedOrRejectedMsgFromBot(Bill bill, boolean approval)
     {
         String text = String
-            .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
-                bill.getCreationDate(), approval ? "accepted" : "rejected");
+                .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
+                        bill.getCreationDate(), approval ? "accepted" : "rejected");
         Message message = new Message(bill.getCreator(), text);
         sendMessage(BOT_TOKEN, message);
     }
