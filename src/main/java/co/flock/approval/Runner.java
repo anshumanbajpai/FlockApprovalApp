@@ -5,7 +5,6 @@ import co.flock.approval.database.DbConfig;
 import co.flock.approval.database.DbManager;
 import co.flock.approval.database.User;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -45,8 +44,13 @@ public class Runner
         post("/create", (req, res) -> {
             String body = req.body();
             _logger.debug("Received request with body: " + body);
-            ObjectMapper mapper = new ObjectMapper();
-            ApprovalRequest approvalRequest = mapper.readValue(body, ApprovalRequest.class);
+            JSONObject jsonObject = new JSONObject(body);
+            int amount = Integer.parseInt(jsonObject.getString("amount"));
+            String requestorId = jsonObject.getString("requestorId");
+            String requestorName = jsonObject.getString("requestorName");
+            String approverId = jsonObject.getString("approverId");
+            String approverName = jsonObject.getString("approverName");
+            ApprovalRequest approvalRequest = new ApprovalRequest(amount, requestorId, requestorName, approverId, approverName);
             _logger.debug("approvalRequest created: " + approvalRequest);
             User user = _dbManager.getUserById(approvalRequest.getRequestorId());
             _logger.debug("requestor user: " + user);
