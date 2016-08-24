@@ -12,7 +12,7 @@ $(document).ready(function()
          console.log("userId: " + parsedEvent.userId);
          console.log("chat: " + parsedEvent.chat);
          requestorId = parsedEvent.userId;
-         requestorId = parsedEvent.userName;
+         requestorName = parsedEvent.userName;
          approverId = parsedEvent.chat;
          approverName = parsedEvent.chatName;
          generateApprovalRequest(amount);
