@@ -41,7 +41,7 @@ public class MessagingService
         views.setHtml(htmlView);
 
         Image original = new Image();
-        original.setSrc("<source>");
+        original.setSrc(bill.getPath());
         ImageView imageView = new ImageView(original);
         views.setImage(imageView);
 
@@ -61,8 +61,8 @@ public class MessagingService
     public static void sendBillApprovedOrRejectedMsgFromBot(Bill bill, boolean approval)
     {
         String text = String
-                .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
-                        bill.getCreationDate(), approval ? "accepted" : "rejected");
+            .format("Your bill of amount Rs %s created on %s has been %s.", bill.getAmount(),
+                bill.getCreationDate(), approval ? "accepted" : "rejected");
         Message message = new Message(bill.getCreator(), text);
         sendMessage(BOT_TOKEN, message);
     }
