@@ -40,12 +40,18 @@ public class MessagingService
         View views = new View();
         views.setHtml(htmlView);
 
+        Image original = new Image();
+        original.setSrc("<source>");
+        ImageView imageView = new ImageView(original);
+        views.setImage(imageView);
 
         WidgetView widgetView = new WidgetView();
         widgetView.setSrc("https://5ab5e251.ngrok.io/view?billId=" + bill.getId());
         views.setWidget(widgetView);
         attachment.setViews(views);
         attachment.setButtons(buttons);
+        attachment.setDescription("Status: " + bill.getStatus());
+        attachment.setTitle("Amount: " + bill.getAmount());
         message.setAttachments(new Attachment[]{attachment});
         String messageJson = new Gson().toJson(message);
         _logger.debug("messageJson: " + messageJson);
