@@ -28,8 +28,11 @@ public class Bill
     @DatabaseField(columnName = Fields.CREATION_DATE, dataType = DataType.DATE)
     private Date _creationDate;
 
+    private String _path;
 
-    public Bill(int amount, String approver, String approverName, String creator, String creatorName, Status status, Date date)
+
+    public Bill(int amount, String approver, String approverName, String creator,
+                String creatorName, Status status, Date date)
     {
         _amount = amount;
         _approver = approver;
@@ -40,7 +43,8 @@ public class Bill
         _creationDate = date;
     }
 
-    public Bill(int amount, String approver, String approverName, String creator, String creatorName)
+    public Bill(int amount, String approver, String approverName, String creator,
+                String creatorName)
     {
         this(amount, approver, approverName, creator, creatorName, Status.PENDING, new Date());
     }
@@ -94,19 +98,29 @@ public class Bill
         return _creationDate;
     }
 
+    public void setPath(String p)
+    {
+        _path = p;
+    }
+
     @Override
     public String toString()
     {
         return "Bill{" +
-                "_id=" + _id +
-                ", _amount=" + _amount +
-                ", _approver='" + _approver + '\'' +
-                ", _approverName='" + _approverName + '\'' +
-                ", _creator='" + _creator + '\'' +
-                ", _creatorName='" + _creatorName + '\'' +
-                ", _status=" + _status +
-                ", _creationDate=" + _creationDate +
-                '}';
+               "_id=" + _id +
+               ", _amount=" + _amount +
+               ", _approver='" + _approver + '\'' +
+               ", _approverName='" + _approverName + '\'' +
+               ", _creator='" + _creator + '\'' +
+               ", _creatorName='" + _creatorName + '\'' +
+               ", _status=" + _status +
+               ", _creationDate=" + _creationDate +
+               '}';
+    }
+
+    public String getPath()
+    {
+        return _path;
     }
 
     public enum Status

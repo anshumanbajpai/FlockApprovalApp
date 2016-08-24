@@ -28,10 +28,12 @@ public class Runner
     private static final Logger _logger = Logger.getLogger(Runner.class);
     private static DbManager _dbManager;
     private static MessagingService _messagingService;
+    private static BillImgCreator _imgCreator;
 
     public static void main(String[] args) throws Exception
     {
         //secure("deploy/keystore.jks", "password", null, null);
+        _imgCreator = new BillImgCreator();
         _logger.debug("Starting..");
         _dbManager = new DbManager(getDbConfig());
         _messagingService = new MessagingService();
@@ -50,6 +52,7 @@ public class Runner
             _logger.debug("approvalRequest created: " + approvalRequest);
             User user = _dbManager.getUserById(approvalRequest.getRequestorId());
             _logger.debug("requestor user: " + user);
+
             insertBillAndSendMsg(approvalRequest, user);
             return "Approval created";
         });
@@ -127,7 +130,7 @@ public class Runner
         });
     }
 
-    private static Map<String,Bill> getLauncherMapForBill(String billId) throws SQLException
+    private static Map<String, Bill> getLauncherMapForBill(String billId) throws SQLException
     {
         Map<String, Bill> s = new HashMap<>();
         _logger.debug("String : " + billId);
@@ -146,6 +149,10 @@ public class Runner
                 approvalRequest.getRequestorName(), approvalRequest.getApproverId(),
                 approvalRequest.getApproverName());
         _logger.debug("Sending approval request for bill: " + bill);
+        _imgCreator.createBillImg(bill);
+        String p = getBaseUrl() + "/js/bill" + bill.getId() + ".png";
+        _logger.debug("Path : " + p);
+        bill.setPath(p);
         _messagingService.sendApprovalRequestMessage(user, bill);
     }
 
@@ -180,6 +187,12 @@ public class Runner
         return new DbConfig(bundle.getString("db_host"),
             Integer.parseInt(bundle.getString("db_port")), bundle.getString("db_name"),
             bundle.getString("db_username"), bundle.getString("db_password"));
+    }
+
+    private static String getBaseUrl()
+    {
+        ResourceBundle bundle = ResourceBundle.getBundle("config", Locale.getDefault());
+        return bundle.getString("base_url");
     }
 
     private static Map<String, List<Bill>> getLauncherMap(String queryString) throws SQLException
